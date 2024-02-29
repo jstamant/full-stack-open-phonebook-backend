@@ -1,0 +1,27 @@
+{
+  "name": "full-stack-open-phonebook-backend",
+  "version": "1.0.0",
+  "description": "Phonebook backend service for Full Stack Open course, part 3",
+  "main": "index.js",
+  "scripts": {
+	"start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jstamant/full-stack-open-phonebook-backend.git"
+  },
+  "author": "Justin St-Amant",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jstamant/full-stack-open-phonebook-backend/issues"
+  },
+  "homepage": "https://github.com/jstamant/full-stack-open-phonebook-backend#readme",
+  "dependencies": {
+    "express": "^4.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
