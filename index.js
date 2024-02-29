@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const port = 3001
 
-const contacts = [
+let contacts = [
   {
     "id": 1,
     "name": "Arto Hellas",
@@ -38,6 +38,17 @@ app.get('/api/persons/:id', (request, response) => {
   const person = contacts.find((contact) => contact.id === id)
   if (person) {
     response.json(person)
+  } else {
+    response.status(404).end()
+  }
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const person = contacts.find(contact => contact.id === id)
+  if (person) {
+    contacts = contacts.filter(contact => contact.id !== id)
+    response.status(204).end()
   } else {
     response.status(404).end()
   }
