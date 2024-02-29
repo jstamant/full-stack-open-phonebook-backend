@@ -33,6 +33,16 @@ app.get('/api/persons', (request, response) => {
   response.json(contacts)
 })
 
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const person = contacts.find((contact) => contact.id === id)
+  if (person) {
+    response.json(person)
+  } else {
+    response.status(404).end()
+  }
+})
+
 app.listen(port, () => {
   console.log(`Phonebook backend is running and listening on port ${port}`)
 })
