@@ -2,6 +2,10 @@
 
 This repository is the code for the part 3 exercises of [Full Stack Open](https://fullstackopen.com/en/part3).
 
+## Deploying
+
+This backend is meant to deploy to Fly.io. Once running, it should be located at https://full-stack-open-phonebook-backend.fly.dev/api/persons
+
 ## Running
 
 As per the exercise instruction, script `npm start` and `npm run dev`

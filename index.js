@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const { env } = require('process')
 
 const app = express()
 app.use(cors())
@@ -15,8 +16,6 @@ morgan.token('post-body', (request, response) => {
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
-
-const port = 3001
 
 let contacts = [
   {
@@ -87,6 +86,7 @@ app.post('/api/persons', (request, response) => {
   response.json(person)
 })
 
+const port = process.env.PORT || 3001
 app.listen(port, () => {
   console.log(`Phonebook backend is running and listening on port ${port}`)
 })
