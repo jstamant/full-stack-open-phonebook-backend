@@ -3,7 +3,16 @@ const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
-app.use(morgan('tiny'))
+
+morgan.token('post-body', (request, response) => {
+  if (request.method == 'POST') {
+    return JSON.stringify(request.body)
+  }
+  // Must return a space, or the token will print a '-'
+  return ' '
+})
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
 const port = 3001
 
