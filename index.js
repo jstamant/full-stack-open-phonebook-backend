@@ -94,6 +94,19 @@ app.post('/api/persons', (request, response) => {
   contact.save().then(contact => response.json(contact))
 })
 
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body
+  const contact = { name: body.name, number: body.number }
+  Contact.findByIdAndUpdate(request.params.id, contact, { new: true })
+    .then(contact => {
+      if (contact) {
+        response.json(contact)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+})
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
