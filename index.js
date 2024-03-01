@@ -79,14 +79,12 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ error: 'Missing name and/or number in request' })
   }
 
-  if (contacts.find(contact => contact.name == body.name)) {
-    return response.status(400).json({ error: `${body.name} already exists in the phonebook` })
-  }
+  // if (contacts.find(contact => contact.name == body.name)) {
+  //   return response.status(400).json({ error: `${body.name} already exists in the phonebook` })
+  // }
 
-  const id = Math.floor(Math.random() * 1000000)
-  const person = { id, name: body.name, number: body.number }
-  contacts = contacts.concat(person)
-  response.json(person)
+  const contact = new Contact({ name: body.name, number: body.number })
+  contact.save().then(contact => response.json(contact))
 })
 
 const port = process.env.PORT || 3001
