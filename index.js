@@ -48,20 +48,25 @@ app.get('/info', (request, response) => {
   response.send(`<p>The phonebook has contact information for ${contacts.length} people.</p><p>${new Date}</p>`)
 })
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
   Contact.find({})
-    .then(contacts => {
-      response.json(contacts)
-    })
+    .then(contacts => response.json(contacts))
+    .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Contact.findById(request.params.id)
-    .then(contact => response.json(contact))
-    .catch(error => response.status(404).end())
+    .then(contact => {
+      if (contact) {
+        response.json(contact)
+      } else {
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   Contact.findByIdAndDelete(id)
     .then(contact => {
@@ -71,9 +76,7 @@ app.delete('/api/persons/:id', (request, response) => {
         response.status(404).end()
       }
     })
-    .catch(error => {
-      response.status(400).end()
-    })
+    .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -90,6 +93,20 @@ app.post('/api/persons', (request, response) => {
   const contact = new Contact({ name: body.name, number: body.number })
   contact.save().then(contact => response.json(contact))
 })
+
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'Malformed ID'})
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
+
 
 const port = process.env.PORT || 3001
 app.listen(port, () => {
