@@ -20,7 +20,6 @@ morgan.token('post-body', (request, response) => {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-body'))
 
-
 app.get('/info', (request, response, next) => {
   Contact.countDocuments({})
     .then(count => {
@@ -50,50 +49,54 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   Contact.findByIdAndDelete(id)
-    .then(contact => {
-      if (contact) {
-        response.status(204).json(contact)
+    .then(deleted => {
+      if (deleted) {
+        response.status(204).json(deleted)
       } else {
-        response.status(404).end()
+        let error = new Error(`Resource "${id}" not found in database`)
+        error.name = 'NotFound'
+        next(error)
       }
     })
     .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({ error: 'Missing name and/or number in request' })
-  }
-
-  // if (contacts.find(contact => contact.name == body.name)) {
-  //   return response.status(400).json({ error: `${body.name} already exists in the phonebook` })
-  // }
-
   const contact = new Contact({ name: body.name, number: body.number })
-  contact.save().then(contact => response.json(contact))
+  contact.save()
+    .then(contact => response.json(contact))
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const body = request.body
-  const contact = { name: body.name, number: body.number }
-  Contact.findByIdAndUpdate(request.params.id, contact, { new: true })
-    .then(contact => {
-      if (contact) {
-        response.json(contact)
+  const { name, number } = request.body
+  Contact.findByIdAndUpdate(
+    request.params.id,
+    { name, number },
+    { new: true, runValidators: true })
+    .then(updated => {
+      if (updated) {
+        response.json(updated)
       } else {
-        response.status(404).end()
+        let error = new Error(`Resource "${name}" not found in database`)
+        error.name = 'NotFound'
+        next(error)
       }
     })
     .catch(error => next(error))
 })
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-
+  console.error(`${error.name}: ${error.message}`)
+  //TODO rm return
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'Malformed ID'})
+    return response.status(400).send({ error: 'Malformed ID' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).send({ error: error.message })
+  } else if (error.name === 'NotFound') {
+    return response.status(404).send({ error: error.message })
   }
 
   next(error)
