@@ -13,13 +13,22 @@ mongoose.connect(url)
     console.log('Error connecting to MongoDB:', error.message)
   })
 
+const numberValidator = [
+  /^\d{2,3}-\d+$/,
+  'Phone number is invalid: must be two parts, all numbers (ex 123-4567)'
+]
+
 const contactSchema = new mongoose.Schema({
   name: {
     type: String,
     minLength: 3,
     required: true
   },
-  number: String
+  number: {
+    type: String,
+    minLength: 8,
+    validate: numberValidator
+  }
 })
 
 contactSchema.set('toJSON', {
